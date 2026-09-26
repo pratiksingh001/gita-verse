@@ -8,7 +8,9 @@ import { Chapter } from './pages/Chapter'
 import { Chapters } from './pages/Chapters'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
+import { Notes } from './pages/Notes'
 import { Search } from './pages/Search'
+import { SignIn } from './pages/SignIn'
 import { Situation } from './pages/Situation'
 import { Situations } from './pages/Situations'
 import { Verse } from './pages/Verse'
@@ -28,6 +30,8 @@ export function App() {
           <Route path="guidance/:slug" element={<Situation />} />
           <Route path="search" element={<Search />} />
           <Route path="bookmarks" element={<Bookmarks />} />
+          <Route path="notes" element={<Notes />} />
+          <Route path="signin" element={<SignIn />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

@@ -5,6 +5,7 @@ import { Link, NavLink, useLocation, useNavigate, useOutlet } from 'react-router
 
 import { isTyping } from '../lib/hooks'
 import { ease } from '../lib/motion'
+import { AccountMenu } from './AccountMenu'
 import { LotusMark } from './Ornament'
 import { SettingsPanel } from './SettingsPanel'
 
@@ -117,6 +118,7 @@ function Header() {
           ))}
           <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />
           <SettingsPanel />
+          <AccountMenu />
         </nav>
       </div>
     </header>

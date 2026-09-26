@@ -1,10 +1,12 @@
-"""Database tables for the Gita content.
+"""Database tables: the Gita content, and readers' accounts and personal data.
 
 Primary keys reuse the IDs from the gita/gita dataset so the seed is
 repeatable and translations keep pointing at the right verses.
 """
 
-from sqlalchemy import Computed, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from datetime import datetime
+
+from sqlalchemy import Computed, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -118,5 +120,62 @@ class SituationVerse(Base):
     verse_id: Mapped[int] = mapped_column(ForeignKey("verses.id"), primary_key=True)
     position: Mapped[int] = mapped_column(Integer)
     note: Mapped[str] = mapped_column(Text)  # why this verse helps, in a sentence or two
+
+    verse: Mapped[Verse] = relationship()
+
+
+# --- user accounts and personal data ---------------------------------------
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(320), unique=True)  # stored lowercase
+    name: Mapped[str] = mapped_column(String(200))
+    # Null for accounts that only ever signed in with Google.
+    password_hash: Mapped[str | None] = mapped_column(String(200))
+    google_sub: Mapped[str | None] = mapped_column(String(64), unique=True)  # Google's stable user ID
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    last_read_verse_id: Mapped[int | None] = mapped_column(ForeignKey("verses.id"))
+    last_read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class UserSession(Base):
+    """A signed-in browser. Only a SHA-256 hash of the cookie token is stored."""
+
+    __tablename__ = "sessions"
+
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    user: Mapped[User] = relationship()
+
+
+class Bookmark(Base):
+    __tablename__ = "bookmarks"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    verse_id: Mapped[int] = mapped_column(ForeignKey("verses.id"), primary_key=True)
+    excerpt: Mapped[str] = mapped_column(Text)  # translation shown when it was saved
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    verse: Mapped[Verse] = relationship()
+
+
+class Annotation(Base):
+    """A reader's private note and/or highlight colour on a verse."""
+
+    __tablename__ = "annotations"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    verse_id: Mapped[int] = mapped_column(ForeignKey("verses.id"), primary_key=True)
+    note: Mapped[str] = mapped_column(Text, default="")
+    highlight: Mapped[str | None] = mapped_column(String(16))  # "saffron" | "sage" | "sky" | "rose"
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
     verse: Mapped[Verse] = relationship()

@@ -2,7 +2,8 @@ import { Bookmark, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Link } from 'react-router'
 
-import { LinkButton, Message } from '../components/States'
+import { LinkButton, Message, Skeleton } from '../components/States'
+import { useUser } from '../lib/account'
 import { useDocumentTitle } from '../lib/hooks'
 import { ease, rise, stagger } from '../lib/motion'
 import { useBookmarks } from '../lib/reading'
@@ -12,7 +13,18 @@ const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: '
 
 export function Bookmarks() {
   useDocumentTitle('Bookmarks')
-  const { bookmarks, remove } = useBookmarks()
+  const { bookmarks, remove, isLoading } = useBookmarks()
+  const { data: user } = useUser()
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-3 pt-32">
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton key={i} className="h-28 rounded-2xl" />
+        ))}
+      </div>
+    )
+  }
 
   if (!bookmarks.length) {
     return (
@@ -33,7 +45,17 @@ export function Bookmarks() {
           Bookmarks
         </motion.h1>
         <motion.p variants={rise} className="mt-3 text-sm text-faint">
-          {bookmarks.length} saved {bookmarks.length === 1 ? 'verse' : 'verses'} · stored in this browser
+          {bookmarks.length} saved {bookmarks.length === 1 ? 'verse' : 'verses'} ·{' '}
+          {user ? (
+            'synced to your account'
+          ) : (
+            <>
+              stored in this browser ·{' '}
+              <Link to="/signin" state={{ from: '/bookmarks' }} className="text-accent">
+                sign in to sync
+              </Link>
+            </>
+          )}
         </motion.p>
       </motion.header>
 
@@ -59,7 +81,7 @@ export function Bookmarks() {
                 <p className="mt-2 text-xs text-faint">Saved {dateFormat.format(new Date(b.at))}</p>
               </Link>
               <button
-                onClick={() => remove(b.ref)}
+                onClick={() => remove(b)}
                 aria-label={`Remove bookmark ${b.ref}`}
                 className="absolute top-3 right-3 grid size-8 place-items-center rounded-full text-faint opacity-60 transition-all hover:bg-paper hover:text-ink group-hover:opacity-100"
               >

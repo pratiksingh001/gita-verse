@@ -4,3 +4,6 @@ psycopg[binary]>=3.2
 alembic>=1.14
 pydantic-settings>=2.6
 httpx>=0.28
+pwdlib[argon2]>=0.2
+google-auth>=2.35
+requests>=2.32

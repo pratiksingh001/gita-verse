@@ -28,6 +28,7 @@ cp .env.example .env
 # 3. Create tables and load the Gita data
 alembic upgrade head
 python -m seed.seed
+python -m seed.fetch_audio   # optional: verse recitations
 
 # 4. Run the API
 fastapi dev app/main.py
@@ -85,6 +86,37 @@ Translations included:
 
 Modern translations may be copyrighted by their publishers. Credit each translator in the UI,
 and confirm rights before a commercial launch.
+
+## Accounts
+
+Readers can create an account with email and password, or sign in with Google. Signed-in
+readers get bookmarks and reading progress synced across devices, private notes and
+highlights, and reading plans. Signed-out readers keep bookmarks in their browser; they are
+merged into the account on first sign-in.
+
+Passwords are hashed with Argon2id. Sessions are random tokens in an `HttpOnly`,
+`SameSite=Lax` cookie; the database stores only their SHA-256 hash.
+
+**Enabling Google sign-in** (optional; the button is hidden until configured):
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an
+   **OAuth client ID** of type **Web application**.
+2. Under **Authorized JavaScript origins**, add `http://localhost:5173` (and your production
+   URL later). No redirect URI is needed.
+3. Put the client ID in `backend/.env`: `GOOGLE_CLIENT_ID=....apps.googleusercontent.com`
+4. Restart the API.
+
+**Production:** set `COOKIE_SECURE=true` (HTTPS only), and serve the frontend and API from the
+same site (e.g. `gitaverse.app` and `api.gitaverse.app`), because the session cookie is `SameSite=Lax`.
+
+## Recitations
+
+```bash
+cd backend && python -m seed.fetch_audio   # ~112 MB into backend/media/ (not in git)
+```
+
+In production, upload `backend/media/audio/` to object storage or a CDN and set
+`AUDIO_BASE_URL` to its public URL.
 
 ## Schema changes
 

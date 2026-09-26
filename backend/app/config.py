@@ -19,5 +19,11 @@ class Settings(BaseSettings):
     # media folder; in production point it at object storage or a CDN.
     audio_base_url: str = "/media/audio"
 
+    # OAuth client ID from Google Cloud Console; Google sign-in is hidden when unset.
+    google_client_id: str | None = None
+    # Send the session cookie over HTTPS only. Must be true in production.
+    cookie_secure: bool = False
+    session_days: int = 30
+
 
 settings = Settings()

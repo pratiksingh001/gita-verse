@@ -10,17 +10,29 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiGet<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
+async function request<T>(method: string, path: string, init: RequestInit = {}): Promise<T> {
+  // "include" sends the session cookie even when the API is on another origin in production.
+  const res = await fetch(`${BASE_URL}${path}`, { method, credentials: 'include', ...init })
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    // FastAPI validation errors put a list in `detail`; show the first message.
+    const detail = Array.isArray(body?.detail) ? body.detail[0]?.msg : body?.detail
+    throw new ApiError(res.status, detail ?? `Request failed (${res.status})`)
+  }
+  return res.status === 204 ? (null as T) : res.json()
+}
+
+export function apiGet<T>(path: string, params?: Record<string, string | number | undefined>): Promise<T> {
   const query = new URLSearchParams()
   for (const [key, value] of Object.entries(params ?? {})) {
     if (value !== undefined) query.set(key, String(value))
   }
-  const url = `${BASE_URL}${path}${query.size ? `?${query}` : ''}`
+  return request<T>('GET', `${path}${query.size ? `?${query}` : ''}`)
+}
 
-  const res = await fetch(url)
-  if (!res.ok) {
-    const body = await res.json().catch(() => null)
-    throw new ApiError(res.status, body?.detail ?? `Request failed (${res.status})`)
-  }
-  return res.json()
+export function apiSend<T>(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown): Promise<T> {
+  return request<T>(method, path, {
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
 }

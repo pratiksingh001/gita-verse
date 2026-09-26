@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 
 import { useChapter } from '../api/hooks'
+import type { Highlight } from '../api/types'
 import type { NavState } from '../components/Layout'
 import { Ornament } from '../components/Ornament'
 import { ErrorState, LinkButton, Skeleton, SkeletonLines } from '../components/States'
 import { useDocumentTitle } from '../lib/hooks'
 import { ease, rise, stagger } from '../lib/motion'
+import { HIGHLIGHTS, useAnnotations } from '../lib/annotations'
 import { useBookmarks } from '../lib/reading'
 import { useSettings } from '../lib/settings'
 import { lines, verseUrl } from '../lib/text'
@@ -18,6 +20,7 @@ export function Chapter() {
   const { language } = useSettings()
   const { data: chapter, isPending, error, refetch } = useChapter(number, language)
   const { isBookmarked } = useBookmarks()
+  const { byRef } = useAnnotations()
   useDocumentTitle(chapter ? `Chapter ${chapter.number}: ${chapter.name_translation}` : undefined)
 
   if (error) return <ErrorState error={error} retry={refetch} />
@@ -75,7 +78,8 @@ export function Chapter() {
                 to={verseUrl(chapter.number, verse.verse)}
                 className="group -mx-4 flex gap-5 rounded-xl px-4 py-4 transition-colors duration-300 hover:bg-surface/70 sm:gap-8"
               >
-                <span className="w-12 shrink-0 pt-0.5 text-sm font-medium text-accent tabular-nums">
+                <span className="relative w-12 shrink-0 pt-0.5 text-sm font-medium text-accent tabular-nums">
+                  <HighlightDot highlight={byRef(verse.ref)?.highlight} />
                   {verse.ref}
                   {isBookmarked(verse.ref) && (
                     <span className="ml-1.5 inline-block size-1.5 rounded-full bg-accent align-middle" title="Bookmarked" />
@@ -163,5 +167,17 @@ function ChapterSkeleton() {
       <Skeleton className="mx-auto mt-4 h-12 w-72" />
       <SkeletonLines count={4} className="mt-14" />
     </div>
+  )
+}
+
+/** A small bar in the reader's highlight colour, in the margin beside the verse number. */
+function HighlightDot({ highlight }: { highlight?: Highlight | null }) {
+  if (!highlight) return null
+  return (
+    <span
+      title={`${HIGHLIGHTS[highlight].label} highlight`}
+      className="absolute top-1 -left-3 h-4 w-1 rounded-full"
+      style={{ backgroundColor: HIGHLIGHTS[highlight].color }}
+    />
   )
 }

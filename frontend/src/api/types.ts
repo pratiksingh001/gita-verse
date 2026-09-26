@@ -106,3 +106,37 @@ export interface SituationDetail {
   description: string
   verses: SituationVerse[]
 }
+
+// --- accounts and personal data (backend/app/routers/auth.py, me.py) ---
+
+export interface User {
+  id: number
+  email: string
+  name: string
+  has_password: boolean
+  google_linked: boolean
+}
+
+export interface VerseLocation {
+  chapter: number
+  verse: number
+  ref: string
+  chapter_name: string
+}
+
+export interface ServerBookmark extends VerseLocation {
+  excerpt: string
+  saved_at: string
+}
+
+export interface ServerProgress extends VerseLocation {
+  read_at: string
+}
+
+export type Highlight = 'saffron' | 'sage' | 'sky' | 'rose'
+
+export interface Annotation extends VerseLocation {
+  note: string
+  highlight: Highlight | null
+  updated_at: string
+}

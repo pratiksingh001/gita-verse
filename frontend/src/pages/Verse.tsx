@@ -12,6 +12,7 @@ import { BookmarkButton } from '../components/BookmarkButton'
 import { Commentaries } from '../components/Commentaries'
 import { Disclosure } from '../components/Disclosure'
 import type { NavState } from '../components/Layout'
+import { NotePanel } from '../components/NotePanel'
 import { Ornament } from '../components/Ornament'
 import { PillSelect } from '../components/PillSelect'
 import { Segmented } from '../components/Segmented'
@@ -19,7 +20,7 @@ import { ShareButton } from '../components/ShareDialog'
 import { ErrorState, Skeleton, SkeletonLines } from '../components/States'
 import { isTyping, useDocumentTitle } from '../lib/hooks'
 import { ease, rise, stagger } from '../lib/motion'
-import { setLastRead, type SavedVerse, useBookmarks } from '../lib/reading'
+import { type SavedVerse, useBookmarks, useRecordReading } from '../lib/reading'
 import { updateSettings, useSettings } from '../lib/settings'
 import type { CardContent } from '../lib/shareImage'
 import { excerpt, isSpeakerLine, lines, parseWordMeanings, pickTranslation, translationsIn, verseUrl } from '../lib/text'
@@ -65,9 +66,10 @@ export function Verse() {
   )
 
   // Remember the reading position, and preload the neighbours so next/prev feel instant.
+  const recordReading = useRecordReading()
   useEffect(() => {
     if (!verse) return
-    setLastRead({
+    recordReading({
       chapter: verse.chapter,
       verse: verse.verse,
       ref: verse.ref,
@@ -83,7 +85,7 @@ export function Verse() {
         })
       }
     }
-  }, [verse, queryClient])
+  }, [verse, queryClient, recordReading])
 
   // ← / → move between verses, B bookmarks.
   useEffect(() => {
@@ -221,6 +223,7 @@ export function Verse() {
         </motion.section>
 
         <motion.div variants={rise} className="mt-14 space-y-6">
+          <NotePanel chapter={verse.chapter} verse={verse.verse} refLabel={verse.ref} chapterName={verse.chapter_name} />
           <WordMeanings text={verse.word_meanings} />
           <Commentaries chapter={verse.chapter} verse={verse.verse} />
         </motion.div>
