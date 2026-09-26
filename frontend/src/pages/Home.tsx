@@ -3,6 +3,8 @@ import { motion } from 'motion/react'
 import { Link } from 'react-router'
 
 import { useSituations, useVerseOfTheDay } from '../api/hooks'
+import { KrishnaFlute } from '../components/art/KrishnaFlute'
+import { Morpankh } from '../components/art/Morpankh'
 import { LotusMark, Ornament } from '../components/Ornament'
 import { LinkButton, SkeletonLines } from '../components/States'
 import { useDocumentTitle } from '../lib/hooks'
@@ -21,6 +23,9 @@ export function Home() {
     <motion.div initial="hidden" animate="show" variants={stagger(0.12)} className="pt-12 sm:pt-20">
       {/* Hero */}
       <section className="mx-auto max-w-2xl text-center">
+        <motion.div variants={rise} className="mx-auto -mt-4 mb-4 w-56 text-accent/70 sm:w-64">
+          <KrishnaFlute />
+        </motion.div>
         <motion.p variants={rise} className="font-sanskrit text-lg text-accent">
           श्रीमद्भगवद्गीता
         </motion.p>
@@ -104,7 +109,10 @@ function VerseOfTheDay() {
         <LotusMark className="size-3.5 text-accent/70" /> Verse of the day
       </div>
 
-      <div className="glow">
+      <div className="glow relative">
+        <Morpankh
+          className="pointer-events-none absolute -top-10 -right-3 z-10 h-28 w-auto rotate-[28deg] opacity-80 sm:-right-6 sm:h-32"
+        />
         <Link
           to={verse ? verseUrl(verse.chapter, verse.verse) : '/'}
           aria-disabled={!verse}

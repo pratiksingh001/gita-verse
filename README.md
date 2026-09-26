@@ -118,6 +118,22 @@ cd backend && python -m seed.fetch_audio   # ~112 MB into backend/media/ (not in
 In production, upload `backend/media/audio/` to object storage or a CDN and set
 `AUDIO_BASE_URL` to its public URL.
 
+## Background music
+
+The app plays soft flute music in the background (muted with the floating button, volume in
+reading settings). It starts on the visitor's first click or key press, because browsers block
+sound before any interaction, and fades out while a verse is being recited.
+
+The track isn't in the repo. Download a royalty-free bansuri track, for example from
+[Pixabay](https://pixabay.com/music/search/bansuri/) (Pixabay Content License: free to use in
+an app, no attribution required), and save it as:
+
+```
+frontend/public/music/bansuri.mp3
+```
+
+The music button and setting stay hidden until the file is there.
+
 ## Schema changes
 
 After editing `backend/app/models.py`:

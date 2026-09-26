@@ -4,12 +4,14 @@ import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 import type { Language } from '../api/types'
 import { ease } from '../lib/motion'
+import { useMusicAvailable } from '../lib/music'
 import { TEXT_SCALES, type Theme, updateSettings, useSettings } from '../lib/settings'
 import { Segmented } from './Segmented'
 
 export function SettingsPanel() {
   const [open, setOpen] = useState(false)
   const settings = useSettings()
+  const musicAvailable = useMusicAvailable()
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Close on outside click or Escape.
@@ -107,6 +109,29 @@ export function SettingsPanel() {
                 </StepButton>
               </div>
             </Row>
+
+            {musicAvailable && (
+            <Row label="Flute music">
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0.05}
+                  max={1}
+                  step={0.05}
+                  value={settings.musicVolume}
+                  disabled={!settings.music}
+                  onChange={(e) => updateSettings({ musicVolume: Number(e.target.value) })}
+                  aria-label="Music volume"
+                  className="h-1 w-20 cursor-pointer accent-(--accent) disabled:opacity-40"
+                />
+                <Switch
+                  label="Play background music"
+                  checked={settings.music}
+                  onChange={(music) => updateSettings({ music })}
+                />
+              </div>
+            </Row>
+            )}
 
             <Row label="Transliteration">
               <Switch

@@ -6,7 +6,9 @@ import { Link, NavLink, useLocation, useNavigate, useOutlet } from 'react-router
 import { isTyping } from '../lib/hooks'
 import { ease } from '../lib/motion'
 import { AccountMenu } from './AccountMenu'
-import { LotusMark } from './Ornament'
+import { BackgroundFeather } from './art/BackgroundFeather'
+import { Morpankh } from './art/Morpankh'
+import { MusicPlayer } from './MusicPlayer'
 import { SettingsPanel } from './SettingsPanel'
 
 /** Set as Link/navigate state to slide the next page in from that side (1 = forward). */
@@ -48,6 +50,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      <BackgroundFeather />
       <Header />
       <AnimatePresence mode="wait" custom={dir} initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
         <motion.main
@@ -64,6 +67,7 @@ export function Layout() {
         </motion.main>
       </AnimatePresence>
       <Footer />
+      <MusicPlayer />
     </div>
   )
 }
@@ -82,7 +86,7 @@ function Header() {
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8">
         <Link to="/" className="group flex items-center gap-2.5" aria-label="Gita Verse home">
           <motion.span whileHover={{ rotate: -8, scale: 1.08 }} transition={{ type: 'spring', stiffness: 300 }}>
-            <LotusMark className="size-6 text-accent" />
+            <Morpankh crop="eye" className="h-8 w-auto" />
           </motion.span>
           <span className="font-display text-xl font-semibold tracking-wide">
             Gita <span className="font-medium text-muted italic transition-colors group-hover:text-accent">Verse</span>

@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 
 import { isTyping } from '../lib/hooks'
+import { announceRecitation } from '../lib/music'
 import { updateSettings, useSettings } from '../lib/settings'
 
 const RING_RADIUS = 21
@@ -31,6 +32,9 @@ export function AudioPlayer({ src, autoStart, onEnded }: { src: string; autoStar
     if (autoStart) audioRef.current?.play().catch(() => setPlaying(false))
   }, [autoStart])
 
+  // Leaving the verse stops the recitation without a pause event, so say so explicitly.
+  useEffect(() => () => announceRecitation(false), [])
+
   // P plays or pauses.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -46,12 +50,19 @@ export function AudioPlayer({ src, autoStart, onEnded }: { src: string; autoStar
         ref={audioRef}
         src={src}
         preload="metadata"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
+        onPlay={() => {
+          setPlaying(true)
+          announceRecitation(true)
+        }}
+        onPause={() => {
+          setPlaying(false)
+          announceRecitation(false)
+        }}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime / (e.currentTarget.duration || 1))}
         onEnded={() => {
           setProgress(0)
+          announceRecitation(false)
           onEnded()
         }}
       />

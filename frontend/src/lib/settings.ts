@@ -11,6 +11,8 @@ export interface Settings {
   textSize: number // index into TEXT_SCALES
   showTransliteration: boolean
   autoplay: boolean // continue to the next verse's recitation when one finishes
+  music: boolean // soft flute music in the background
+  musicVolume: number // 0..1
   translator: Record<Language, string> // preferred translator per language
 }
 
@@ -22,6 +24,8 @@ export const DEFAULT_SETTINGS: Settings = {
   textSize: 1,
   showTransliteration: true,
   autoplay: true,
+  music: true,
+  musicVolume: 0.35,
   translator: { en: 'Swami Sivananda', hi: 'Swami Ramsukhdas' },
 }
 
