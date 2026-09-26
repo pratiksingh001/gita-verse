@@ -15,11 +15,13 @@ import type { NavState } from '../components/Layout'
 import { Ornament } from '../components/Ornament'
 import { PillSelect } from '../components/PillSelect'
 import { Segmented } from '../components/Segmented'
+import { ShareButton } from '../components/ShareDialog'
 import { ErrorState, Skeleton, SkeletonLines } from '../components/States'
 import { isTyping, useDocumentTitle } from '../lib/hooks'
 import { ease, rise, stagger } from '../lib/motion'
 import { setLastRead, type SavedVerse, useBookmarks } from '../lib/reading'
 import { updateSettings, useSettings } from '../lib/settings'
+import type { CardContent } from '../lib/shareImage'
 import { excerpt, isSpeakerLine, lines, parseWordMeanings, pickTranslation, translationsIn, verseUrl } from '../lib/text'
 
 export function Verse() {
@@ -45,6 +47,19 @@ export function Verse() {
         chapterName: verse.chapter_name,
         excerpt: excerpt(translation?.text ?? ''),
         at: new Date().toISOString(),
+      },
+    [verse, translation],
+  )
+  // What the share card shows: the verse itself and the translation currently on screen.
+  const shareContent = useMemo<CardContent | undefined>(
+    () =>
+      verse &&
+      translation && {
+        ref: verse.ref,
+        sanskritLines: lines(verse.sanskrit_text).filter((line) => !isSpeakerLine(line)),
+        translation: translation.text,
+        author: translation.author,
+        hindi: translation.language === 'hi',
       },
     [verse, translation],
   )
@@ -103,7 +118,10 @@ export function Verse() {
           Chapter {verse.chapter} <span className="text-faint">·</span>{' '}
           <span className="max-sm:hidden">{verse.chapter_name}</span>
         </Link>
-        {saved && <BookmarkButton saved={isBookmarked(verse.ref)} onToggle={() => toggle(saved)} />}
+        <div className="flex items-center gap-1">
+          {shareContent && <ShareButton content={shareContent} />}
+          {saved && <BookmarkButton saved={isBookmarked(verse.ref)} onToggle={() => toggle(saved)} />}
+        </div>
       </div>
 
       <motion.div initial="hidden" animate="show" variants={stagger(0.1)} className="mx-auto max-w-2xl">

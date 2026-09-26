@@ -134,6 +134,36 @@ def test_commentaries_for_unknown_verse_is_404(client):
     assert client.get("/api/verses/2/73/commentaries").status_code == 404
 
 
+# --- life situations --------------------------------------------------------
+
+
+def test_list_situations(client):
+    situations = client.get("/api/situations").json()
+    assert len(situations) == 12
+    assert situations[0]["slug"] == "anxiety"
+    assert all(s["verse_count"] >= 4 for s in situations)
+
+
+def test_get_situation(client):
+    situation = client.get("/api/situations/anxiety").json()
+    assert situation["title"] == "Anxious about the future"
+    first = situation["verses"][0]
+    assert first["ref"] == "2.47"
+    assert first["translation"].startswith("Your right is only to work")
+    assert first["author"] == "Swami Sivananda"
+    assert first["note"]
+    assert "कर्मण्येवाधिकारस्ते" in first["sanskrit_text"]
+
+
+def test_get_situation_in_hindi(client):
+    verses = client.get("/api/situations/grief", params={"lang": "hi"}).json()["verses"]
+    assert verses and all(v["author"] == "Swami Ramsukhdas" for v in verses)
+
+
+def test_unknown_situation_is_404(client):
+    assert client.get("/api/situations/boredom").status_code == 404
+
+
 # --- search -----------------------------------------------------------------
 
 

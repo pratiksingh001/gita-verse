@@ -1,7 +1,17 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import { apiGet } from './client'
-import type { ChapterDetail, ChapterSummary, Commentary, Language, SearchResponse, VerseDetail, VerseOfTheDay } from './types'
+import type {
+  ChapterDetail,
+  ChapterSummary,
+  Commentary,
+  Language,
+  SearchResponse,
+  SituationDetail,
+  SituationSummary,
+  VerseDetail,
+  VerseOfTheDay,
+} from './types'
 
 const SEARCH_PAGE_SIZE = 20
 
@@ -40,6 +50,20 @@ export function useVerseOfTheDay(date: string) {
   return useQuery({
     queryKey: ['verse-of-the-day', date],
     queryFn: () => apiGet<VerseOfTheDay>('/api/verse-of-the-day', { date }),
+  })
+}
+
+export function useSituations() {
+  return useQuery({
+    queryKey: ['situations'],
+    queryFn: () => apiGet<SituationSummary[]>('/api/situations'),
+  })
+}
+
+export function useSituation(slug: string, lang: Language) {
+  return useQuery({
+    queryKey: ['situation', slug, lang],
+    queryFn: () => apiGet<SituationDetail>(`/api/situations/${slug}`, { lang }),
   })
 }
 

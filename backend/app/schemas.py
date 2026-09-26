@@ -67,6 +67,30 @@ class VerseOfTheDay(VerseDetail):
     date: datetime.date
 
 
+class SituationSummary(BaseModel):
+    slug: str
+    title: str
+    description: str
+    verse_count: int
+
+
+class SituationVerseOut(BaseModel):
+    chapter: int
+    verse: int
+    ref: str
+    sanskrit_text: str
+    translation: str
+    author: str
+    note: str  # why this verse speaks to the situation
+
+
+class SituationDetail(BaseModel):
+    slug: str
+    title: str
+    description: str
+    verses: list[SituationVerseOut]
+
+
 class SnippetPart(BaseModel):
     text: str
     match: bool  # true for words that matched the search; render these highlighted

@@ -18,7 +18,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.models import Author, Chapter, Commentary, Translation, Verse
+from app.models import Author, Chapter, Commentary, Situation, SituationVerse, Translation, Verse
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -161,6 +161,47 @@ def seed_commentaries(db: Session) -> None:
     db.execute(delete(Commentary).where(Commentary.id.not_in([r["id"] for r in rows])))
 
 
+def seed_situations(db: Session) -> list[str]:
+    """Load the curated situations; returns references to verses that don't exist."""
+    verse_ids = {
+        f"{chapter}.{number}": verse_id
+        for verse_id, chapter, number in db.execute(
+            select(Verse.id, Chapter.number, Verse.verse_number).join(Verse.chapter)
+        )
+    }
+    missing = []
+    situations = load("situations.json")
+
+    for position, s in enumerate(situations):
+        stmt = insert(Situation).values(
+            slug=s["slug"], title=s["title"], description=s["description"], position=position
+        )
+        situation_id = db.scalar(
+            stmt.on_conflict_do_update(
+                index_elements=["slug"],
+                set_={"title": stmt.excluded.title, "description": stmt.excluded.description, "position": position},
+            ).returning(Situation.id)
+        )
+        # The curated list is the source of truth: replace this situation's verses wholesale.
+        db.execute(delete(SituationVerse).where(SituationVerse.situation_id == situation_id))
+        for verse_position, v in enumerate(s["verses"]):
+            if v["ref"] not in verse_ids:
+                missing.append(f"{s['slug']}: {v['ref']}")
+                continue
+            db.add(
+                SituationVerse(
+                    situation_id=situation_id,
+                    verse_id=verse_ids[v["ref"]],
+                    position=verse_position,
+                    note=v["note"],
+                )
+            )
+
+    db.execute(delete(Situation).where(Situation.slug.not_in([s["slug"] for s in situations])))
+    db.flush()
+    return missing
+
+
 def upsert_batched(db: Session, model, rows: list[dict], size: int = 1000) -> None:
     # Postgres caps bind parameters per statement, so insert in batches.
     for start in range(0, len(rows), size):
@@ -227,8 +268,9 @@ def main() -> None:
         seed_verses(db)
         seed_translations(db)
         seed_commentaries(db)
+        missing_refs = seed_situations(db)
 
-        errors = validate(db)
+        errors = validate(db) + [f"situation verse not found: {ref}" for ref in missing_refs]
         if errors:
             db.rollback()
             print("Seed failed validation, nothing was saved:")
@@ -240,9 +282,10 @@ def main() -> None:
 
         translations = db.scalar(select(func.count()).select_from(Translation))
         commentaries = db.scalar(select(func.count()).select_from(Commentary))
+        situations = db.scalar(select(func.count()).select_from(Situation))
         print(
             f"Seeded {EXPECTED_CHAPTERS} chapters, {EXPECTED_VERSES} verses, "
-            f"{translations} translations, {commentaries} commentaries."
+            f"{translations} translations, {commentaries} commentaries, {situations} situations."
         )
 
 

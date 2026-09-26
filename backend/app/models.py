@@ -93,3 +93,30 @@ class Commentary(Base):
     text: Mapped[str] = mapped_column(Text)
 
     author: Mapped[Author] = relationship()
+
+
+class Situation(Base):
+    """A life situation (anxiety, grief, ...) with verses curated to help with it."""
+
+    __tablename__ = "situations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True)
+    title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    position: Mapped[int] = mapped_column(Integer)
+
+    verses: Mapped[list["SituationVerse"]] = relationship(
+        order_by="SituationVerse.position", cascade="all, delete-orphan"
+    )
+
+
+class SituationVerse(Base):
+    __tablename__ = "situation_verses"
+
+    situation_id: Mapped[int] = mapped_column(ForeignKey("situations.id", ondelete="CASCADE"), primary_key=True)
+    verse_id: Mapped[int] = mapped_column(ForeignKey("verses.id"), primary_key=True)
+    position: Mapped[int] = mapped_column(Integer)
+    note: Mapped[str] = mapped_column(Text)  # why this verse helps, in a sentence or two
+
+    verse: Mapped[Verse] = relationship()

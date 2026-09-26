@@ -82,3 +82,27 @@ export interface SearchResponse {
   total: number
   results: SearchResult[]
 }
+
+export interface SituationSummary {
+  slug: string
+  title: string
+  description: string
+  verse_count: number
+}
+
+export interface SituationVerse {
+  chapter: number
+  verse: number
+  ref: string
+  sanskrit_text: string
+  translation: string
+  author: string
+  note: string
+}
+
+export interface SituationDetail {
+  slug: string
+  title: string
+  description: string
+  verses: SituationVerse[]
+}

@@ -9,6 +9,9 @@ from app.schemas import Language, TranslationOut, VerseDetail, VerseRef
 
 LOCAL_AUDIO_URL = "/media/audio"
 
+# Translator used wherever a page shows one translation per verse (chapter lists, situations).
+DEFAULT_TRANSLATOR: dict[str, str] = {"en": "Swami Sivananda", "hi": "Swami Ramsukhdas"}
+
 
 def make_ref(chapter: int, verse: int) -> VerseRef:
     return VerseRef(chapter=chapter, verse=verse, ref=f"{chapter}.{verse}")

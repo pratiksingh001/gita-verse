@@ -4,13 +4,11 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Author, Chapter, Translation, Verse
+from app.queries import DEFAULT_TRANSLATOR
 from app.routers import CONTENT_CACHE
 from app.schemas import ChapterDetail, ChapterSummary, ChapterVerse, Language
 
 router = APIRouter(prefix="/api/chapters", tags=["chapters"])
-
-# Translator shown in the chapter's verse list for each language.
-DEFAULT_TRANSLATOR: dict[str, str] = {"en": "Swami Sivananda", "hi": "Swami Ramsukhdas"}
 
 
 @router.get("", response_model=list[ChapterSummary])

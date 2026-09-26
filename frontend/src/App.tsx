@@ -9,6 +9,8 @@ import { Chapters } from './pages/Chapters'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { Search } from './pages/Search'
+import { Situation } from './pages/Situation'
+import { Situations } from './pages/Situations'
 import { Verse } from './pages/Verse'
 
 export function App() {
@@ -22,6 +24,8 @@ export function App() {
           <Route path="chapters" element={<Chapters />} />
           <Route path="chapter/:chapter" element={<Chapter />} />
           <Route path="verse/:chapter/:verse" element={<Verse />} />
+          <Route path="guidance" element={<Situations />} />
+          <Route path="guidance/:slug" element={<Situation />} />
           <Route path="search" element={<Search />} />
           <Route path="bookmarks" element={<Bookmarks />} />
           <Route path="*" element={<NotFound />} />

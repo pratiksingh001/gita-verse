@@ -1,0 +1,143 @@
+[
+  {
+    "slug": "anxiety",
+    "title": "Anxious about the future",
+    "description": "When worry about how things will turn out keeps you awake.",
+    "verses": [
+      { "ref": "2.47", "note": "Your part is the effort, not the outcome. Putting down the weight of results frees you to act well." },
+      { "ref": "2.48", "note": "Steadiness in success and failure alike is itself called yoga: a calm you can practise, not just wish for." },
+      { "ref": "2.14", "note": "Every hard feeling has a beginning and an end. Bear it patiently; it will pass." },
+      { "ref": "9.22", "note": "For those who trust, what is lacking is provided and what is had is preserved." },
+      { "ref": "18.66", "note": "The Gita's final reassurance: take refuge, and do not grieve." }
+    ]
+  },
+  {
+    "slug": "anger",
+    "title": "Struggling with anger",
+    "description": "When irritation turns into words or actions you later regret.",
+    "verses": [
+      { "ref": "2.62", "note": "Anger doesn't appear from nowhere. It grows from dwelling on things, then attachment, then frustrated desire." },
+      { "ref": "2.63", "note": "The cost of anger: confusion, forgetfulness, and finally the loss of good judgement." },
+      { "ref": "3.37", "note": "Desire and anger are two faces of one restless energy. Recognising that is the first step to mastering it." },
+      { "ref": "16.21", "note": "Lust, anger and greed are called three gates to self-destruction. Close them early." },
+      { "ref": "5.26", "note": "Freedom and peace lie close at hand for those who have loosened the grip of desire and anger." }
+    ]
+  },
+  {
+    "slug": "grief",
+    "title": "Grieving a loss",
+    "description": "When someone you love is gone, or something you held dear has ended.",
+    "verses": [
+      { "ref": "2.11", "note": "Krishna's first teaching meets Arjuna in his grief, and gently points beyond it." },
+      { "ref": "2.13", "note": "As we pass through childhood, youth and age, the self passes on. The one we love is not simply lost." },
+      { "ref": "2.20", "note": "The self is never born and never dies. What is essential in a person cannot be destroyed." },
+      { "ref": "2.22", "note": "Like setting aside worn clothes for new ones: an image many have found comforting in loss." },
+      { "ref": "2.27", "note": "Death comes to everything that is born. Accepting this softens the sharpest edge of grief." }
+    ]
+  },
+  {
+    "slug": "unsure-what-to-do",
+    "title": "Unsure what to do",
+    "description": "When you are torn between paths: career, family, or conscience.",
+    "verses": [
+      { "ref": "2.7", "note": "The Gita begins with exactly this confusion. Arjuna admits he doesn't know, and asks for guidance." },
+      { "ref": "3.35", "note": "Your own path, imperfectly walked, is better than someone else's walked perfectly." },
+      { "ref": "3.8", "note": "When in doubt, act. Doing your duty is better than standing still." },
+      { "ref": "18.45", "note": "Fulfilment comes through devotion to the work that is truly yours." },
+      { "ref": "18.47", "note": "The Gita repeats the teaching near its close: follow your own nature, not another's." }
+    ]
+  },
+  {
+    "slug": "fear",
+    "title": "Feeling afraid",
+    "description": "When fear of failure, change or the unknown holds you back.",
+    "verses": [
+      { "ref": "16.1", "note": "Fearlessness heads the list of divine qualities. It is something we can cultivate." },
+      { "ref": "2.40", "note": "No sincere effort on this path is wasted; even a little of it protects from great fear." },
+      { "ref": "4.10", "note": "Many before you have freed themselves from attachment, fear and anger. It can be done." },
+      { "ref": "2.56", "note": "The steady mind is not shaken by adversity, and is free from fear." },
+      { "ref": "9.31", "note": "A promise to hold on to: the devoted never perish." }
+    ]
+  },
+  {
+    "slug": "lonely",
+    "title": "Feeling alone",
+    "description": "When it seems no one understands, or no one is there.",
+    "verses": [
+      { "ref": "6.30", "note": "Whoever sees the divine everywhere is never separated from it, and it is never separated from them." },
+      { "ref": "10.20", "note": "The divine is seated in the heart of every being, including yours, right now." },
+      { "ref": "18.61", "note": "You carry the Lord within you, wherever you are." },
+      { "ref": "9.29", "note": "The divine is equal to all and close to all who turn towards it with love." },
+      { "ref": "9.26", "note": "Nothing grand is needed: a leaf, a flower, a little water offered with love is received." }
+    ]
+  },
+  {
+    "slug": "unmotivated",
+    "title": "Lacking motivation",
+    "description": "When you can't find the energy to begin, or to keep going.",
+    "verses": [
+      { "ref": "2.3", "note": "Krishna's wake-up call: this weakness doesn't suit you. Stand up." },
+      { "ref": "6.5", "note": "Lift yourself by your own effort. You can be your own best friend, or your own worst enemy." },
+      { "ref": "3.19", "note": "Keep doing what needs doing, without clinging to the outcome, and you rise." },
+      { "ref": "6.17", "note": "Balance in eating, rest, sleep and work is the foundation that makes steady effort possible." }
+    ]
+  },
+  {
+    "slug": "restless-mind",
+    "title": "A restless mind",
+    "description": "When your thoughts race and you can't settle or focus.",
+    "verses": [
+      { "ref": "6.34", "note": "Even Arjuna found the mind as hard to hold as the wind. You are in good company." },
+      { "ref": "6.35", "note": "Krishna agrees it is hard, and gives the method: steady practice and letting go." },
+      { "ref": "6.26", "note": "Each time the mind wanders, gently bring it back. That returning is the practice." },
+      { "ref": "2.58", "note": "Like a tortoise drawing in its limbs, withdraw the senses from what disturbs them." },
+      { "ref": "2.66", "note": "Without a steady mind there is no peace, and without peace, no happiness." }
+    ]
+  },
+  {
+    "slug": "desire",
+    "title": "Caught in craving",
+    "description": "When wanting more, and never feeling it is enough, takes over.",
+    "verses": [
+      { "ref": "3.39", "note": "Desire is like fire: the more you feed it, the more it wants." },
+      { "ref": "5.22", "note": "Pleasures that begin and end with the senses are a source of pain. The wise do not rest their happiness there." },
+      { "ref": "2.70", "note": "Be like the ocean: rivers pour in, yet it stays full and unmoved." },
+      { "ref": "2.71", "note": "Peace comes to the one who moves through life without craving or the sense of 'mine'." }
+    ]
+  },
+  {
+    "slug": "self-doubt",
+    "title": "Doubting yourself",
+    "description": "When you feel unworthy, or weighed down by past mistakes.",
+    "verses": [
+      { "ref": "4.36", "note": "Even the greatest wrongdoer can cross over on the raft of knowledge. No one is beyond redemption." },
+      { "ref": "9.30", "note": "What matters is the direction you now face, not where you have been." },
+      { "ref": "6.5", "note": "Don't put yourself down. Raise yourself up; you can be your own friend." },
+      { "ref": "6.6", "note": "When you have mastered yourself, your own mind becomes your ally." },
+      { "ref": "10.41", "note": "Whatever is excellent in any being, including you, is a spark of the divine." }
+    ]
+  },
+  {
+    "slug": "ego",
+    "title": "When ego gets in the way",
+    "description": "When pride, the need to be right, or 'I did this' takes over.",
+    "verses": [
+      { "ref": "3.27", "note": "Nature does the work; only a mind confused by ego thinks 'I am the doer'." },
+      { "ref": "13.8", "note": "Wisdom starts with humility, sincerity, patience and forgiveness." },
+      { "ref": "16.4", "note": "Arrogance, conceit and harshness are named plainly, so we can recognise them in ourselves." },
+      { "ref": "18.58", "note": "With a mind set on the divine you overcome every obstacle; ego alone leads to downfall." }
+    ]
+  },
+  {
+    "slug": "inner-peace",
+    "title": "Seeking inner peace",
+    "description": "When you long for calm that doesn't depend on circumstances.",
+    "verses": [
+      { "ref": "12.12", "note": "Peace follows immediately upon letting go of the fruits of action." },
+      { "ref": "12.13", "note": "Without hatred, friendly and compassionate to all, the same in joy and sorrow." },
+      { "ref": "12.15", "note": "Neither troubling the world nor troubled by it, free from agitation, fear and anxiety." },
+      { "ref": "5.29", "note": "Knowing the divine as the friend of all beings, one attains peace." },
+      { "ref": "2.71", "note": "Letting go of craving and the sense of 'mine' is the doorway to peace." }
+    ]
+  }
+]

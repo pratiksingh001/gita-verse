@@ -1,4 +1,4 @@
-import { Bookmark, BookOpen, Search } from 'lucide-react'
+import { Bookmark, BookOpen, Compass, Search } from 'lucide-react'
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'motion/react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate, useOutlet } from 'react-router'
@@ -16,6 +16,7 @@ export interface NavState {
 
 const NAV = [
   { to: '/chapters', label: 'Chapters', icon: BookOpen },
+  { to: '/guidance', label: 'Guidance', icon: Compass },
   { to: '/search', label: 'Search', icon: Search },
   { to: '/bookmarks', label: 'Bookmarks', icon: Bookmark },
 ]

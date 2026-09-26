@@ -2,7 +2,7 @@ import { ArrowRight, BookOpen } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router'
 
-import { useVerseOfTheDay } from '../api/hooks'
+import { useSituations, useVerseOfTheDay } from '../api/hooks'
 import { LotusMark, Ornament } from '../components/Ornament'
 import { LinkButton, SkeletonLines } from '../components/States'
 import { useDocumentTitle } from '../lib/hooks'
@@ -11,7 +11,7 @@ import { useLastRead } from '../lib/reading'
 import { useSettings } from '../lib/settings'
 import { isSpeakerLine, lines, localDate, pickTranslation, verseUrl } from '../lib/text'
 
-const THEMES = ['Duty', 'Fear', 'Peace', 'Mind', 'Devotion', 'Desire', 'Knowledge', 'Death']
+const GUIDANCE_CHIPS = 6
 
 export function Home() {
   useDocumentTitle(undefined)
@@ -58,22 +58,34 @@ export function Home() {
         <VerseOfTheDay />
       </motion.div>
 
-      {/* Themes */}
-      <motion.section variants={rise} className="mx-auto mt-24 max-w-2xl text-center">
-        <h2 className="text-xs font-medium tracking-[0.2em] text-faint uppercase">Explore by theme</h2>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {THEMES.map((theme) => (
-            <Link
-              key={theme}
-              to={`/search?q=${theme.toLowerCase()}`}
-              className="rounded-full border border-line px-4 py-1.5 font-serif text-[0.95rem] text-muted transition-all duration-300 ease-gentle hover:-translate-y-0.5 hover:border-accent/40 hover:text-accent"
-            >
-              {theme}
-            </Link>
-          ))}
-        </div>
-      </motion.section>
+      <motion.div variants={rise}>
+        <GuidanceChips />
+      </motion.div>
     </motion.div>
+  )
+}
+
+const chipClass =
+  'rounded-full border border-line px-4 py-1.5 font-serif text-[0.95rem] text-muted transition-all duration-300 ease-gentle hover:-translate-y-0.5 hover:border-accent/40 hover:text-accent'
+
+function GuidanceChips() {
+  const { data: situations } = useSituations()
+  if (!situations) return null
+
+  return (
+    <section className="mx-auto mt-24 max-w-2xl text-center">
+      <h2 className="text-xs font-medium tracking-[0.2em] text-faint uppercase">What are you going through?</h2>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        {situations.slice(0, GUIDANCE_CHIPS).map((s) => (
+          <Link key={s.slug} to={`/guidance/${s.slug}`} className={chipClass}>
+            {s.title}
+          </Link>
+        ))}
+        <Link to="/guidance" className={`${chipClass} inline-flex items-center gap-1 border-dashed`}>
+          More <ArrowRight className="size-3.5" />
+        </Link>
+      </div>
+    </section>
   )
 }
 
