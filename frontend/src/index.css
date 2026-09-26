@@ -1,0 +1,189 @@
+@import 'tailwindcss';
+
+/* Dark mode follows the `dark` class on <html>, set from the user's theme setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------- palette */
+
+:root {
+  --paper: #faf7f2; /* page background: warm paper */
+  --surface: #f3eee5; /* cards, raised areas */
+  --ink: #2b2722; /* body text: warm charcoal, never pure black */
+  --muted: #7a7166; /* secondary text */
+  --faint: #a89f92; /* tertiary text, placeholders */
+  --line: #e6dfd3; /* hairlines and borders */
+  --accent: #a65a22; /* muted saffron, used sparingly */
+  --accent-soft: #f1e3d3; /* tinted backgrounds for accent elements */
+  --glow: rgb(214 150 90 / 0.18);
+
+  /* Changed by the text-size setting. */
+  --reading-scale: 1;
+
+  color-scheme: light;
+}
+
+.dark {
+  --paper: #14130f;
+  --surface: #1c1b17;
+  --ink: #eae4d9;
+  --muted: #9a9185;
+  --faint: #6f675d;
+  --line: #2a2823;
+  --accent: #d89a5e;
+  --accent-soft: #2c2218;
+  --glow: rgb(216 154 94 / 0.12);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-serif: 'Source Serif 4 Variable', 'Noto Serif Devanagari Variable', Georgia, serif;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-sanskrit: 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari Variable', serif;
+  --font-hindi: 'Noto Serif Devanagari Variable', 'Tiro Devanagari Sanskrit', serif;
+
+  --ease-gentle: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------- base */
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition:
+      background-color 0.4s ease,
+      color 0.4s ease;
+  }
+
+  body {
+    @apply font-sans;
+    min-height: 100dvh;
+  }
+
+  /* Barely-there paper grain so large empty areas don't feel flat. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .dark body::before {
+    opacity: 0.07;
+    mix-blend-mode: screen;
+    filter: invert(1);
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  mark {
+    background: var(--accent-soft);
+    color: var(--ink);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+}
+
+/* -------------------------------------------------------- reading sizes */
+/* Scaled by --reading-scale so the text-size setting affects only reading text. */
+
+@utility text-sanskrit {
+  font-family: var(--font-sanskrit);
+  font-size: calc(clamp(1.375rem, 1.1rem + 1.2vw, 1.875rem) * var(--reading-scale));
+  line-height: 1.9;
+}
+
+@utility text-reading {
+  font-size: calc(clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem) * var(--reading-scale));
+  line-height: 1.75;
+}
+
+@utility text-reading-sm {
+  font-size: calc(1.0625rem * var(--reading-scale));
+  line-height: 1.7;
+}
+
+/* -------------------------------------------------------------- effects */
+
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 0%,
+    color-mix(in srgb, var(--surface), var(--line) 60%) 50%,
+    var(--surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Slow "breathing" halo behind the verse of the day. */
+@utility glow {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2rem;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--glow), transparent);
+    animation: breathe 7s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

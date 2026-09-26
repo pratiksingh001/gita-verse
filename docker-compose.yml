@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: gita-verse-db
+    environment:
+      POSTGRES_USER: gita
+      POSTGRES_PASSWORD: gita
+      POSTGRES_DB: gita_verse
+    ports:
+      # Host port 5433 so it doesn't clash with a locally installed Postgres on 5432.
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gita -d gita_verse"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
