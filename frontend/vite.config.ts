@@ -9,6 +9,7 @@ export default defineConfig({
     // Forward API calls to FastAPI so the browser sees a single origin in development.
     proxy: {
       '/api': 'http://localhost:8000',
+      '/media': 'http://localhost:8000',
     },
   },
 })

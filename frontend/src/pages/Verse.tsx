@@ -1,15 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 
 import { apiGet } from '../api/client'
 import { useChapters, useVerse } from '../api/hooks'
 import type { Language, VerseDetail, VerseRef } from '../api/types'
+import { AudioPlayer } from '../components/AudioPlayer'
 import { BookmarkButton } from '../components/BookmarkButton'
+import { Commentaries } from '../components/Commentaries'
+import { Disclosure } from '../components/Disclosure'
 import type { NavState } from '../components/Layout'
 import { Ornament } from '../components/Ornament'
+import { PillSelect } from '../components/PillSelect'
 import { Segmented } from '../components/Segmented'
 import { ErrorState, Skeleton, SkeletonLines } from '../components/States'
 import { isTyping, useDocumentTitle } from '../lib/hooks'
@@ -26,6 +30,7 @@ export function Verse() {
   const settings = useSettings()
   const { isBookmarked, toggle } = useBookmarks()
   const navigate = useNavigate()
+  const navState = useLocation().state as NavState | null
   const queryClient = useQueryClient()
   useDocumentTitle(verse ? `Bhagavad Gita ${verse.ref}` : undefined)
 
@@ -106,6 +111,22 @@ export function Verse() {
           Verse {verse.ref}
         </motion.p>
 
+        {verse.audio_url && (
+          <motion.div variants={rise} className="mt-6">
+            <AudioPlayer
+              src={verse.audio_url}
+              autoStart={navState?.autoplay === true}
+              onEnded={() => {
+                if (settings.autoplay && verse.next) {
+                  navigate(verseUrl(verse.next.chapter, verse.next.verse), {
+                    state: { dir: 1, autoplay: true } satisfies NavState,
+                  })
+                }
+              }}
+            />
+          </motion.div>
+        )}
+
         {/* Sanskrit */}
         <motion.div variants={rise} className="mt-8 text-center text-ink">
           {sanskrit.map((line, i) =>
@@ -181,8 +202,9 @@ export function Verse() {
           </AnimatePresence>
         </motion.section>
 
-        <motion.div variants={rise}>
+        <motion.div variants={rise} className="mt-14 space-y-6">
           <WordMeanings text={verse.word_meanings} />
+          <Commentaries chapter={verse.chapter} verse={verse.verse} />
         </motion.div>
       </motion.div>
 
@@ -197,19 +219,12 @@ function TranslatorSelect({ verse, language, current }: { verse: VerseDetail; la
   if (authors.length < 2) return null
 
   return (
-    <label className="relative inline-flex items-center">
-      <span className="sr-only">Translator</span>
-      <select
-        value={current}
-        onChange={(e) => updateSettings({ translator: { ...settings.translator, [language]: e.target.value } })}
-        className="cursor-pointer appearance-none rounded-full border border-line bg-surface/60 py-1.5 pr-8 pl-3.5 text-xs font-medium text-muted transition-colors hover:text-ink"
-      >
-        {authors.map((author) => (
-          <option key={author}>{author}</option>
-        ))}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-2.5 size-3.5 text-faint" />
-    </label>
+    <PillSelect
+      label="Translator"
+      value={current}
+      options={authors}
+      onChange={(author) => updateSettings({ translator: { ...settings.translator, [language]: author } })}
+    />
   )
 }
 
@@ -219,36 +234,16 @@ function WordMeanings({ text }: { text: string }) {
   if (!words.length) return null
 
   return (
-    <section className="mt-14 border-t border-line pt-6">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="mx-auto flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-accent"
-      >
-        Word by word meaning
-        <ChevronDown className={`size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.45, ease }}
-            className="overflow-hidden"
-          >
-            <dl className="grid gap-x-6 gap-y-3 pt-6 sm:grid-cols-2">
-              {words.map(({ term, meaning }, i) => (
-                <div key={i} className="flex gap-3 border-b border-line/60 pb-3 text-[0.95rem]">
-                  <dt className="font-serif text-accent italic">{term}</dt>
-                  <dd className="text-muted">{meaning}</dd>
-                </div>
-              ))}
-            </dl>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
+    <Disclosure label="Word by word meaning" open={open} onToggle={() => setOpen((o) => !o)}>
+      <dl className="grid gap-x-6 gap-y-3 pt-6 sm:grid-cols-2">
+        {words.map(({ term, meaning }, i) => (
+          <div key={i} className="flex gap-3 border-b border-line/60 pb-3 text-[0.95rem]">
+            <dt className="font-serif text-accent italic">{term}</dt>
+            <dd className="text-muted">{meaning}</dd>
+          </div>
+        ))}
+      </dl>
+    </Disclosure>
   )
 }
 

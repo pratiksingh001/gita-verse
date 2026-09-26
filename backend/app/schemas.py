@@ -52,8 +52,15 @@ class VerseDetail(BaseModel):
     transliteration: str
     word_meanings: str
     translations: list[TranslationOut]
+    audio_url: str | None  # Sanskrit recitation, when available
     prev: VerseRef | None
     next: VerseRef | None
+
+
+class CommentaryOut(BaseModel):
+    author: str
+    language: Literal["en", "hi", "sa"]
+    text: str
 
 
 class VerseOfTheDay(VerseDetail):

@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import { apiGet } from './client'
-import type { ChapterDetail, ChapterSummary, Language, SearchResponse, VerseDetail, VerseOfTheDay } from './types'
+import type { ChapterDetail, ChapterSummary, Commentary, Language, SearchResponse, VerseDetail, VerseOfTheDay } from './types'
 
 const SEARCH_PAGE_SIZE = 20
 
@@ -24,6 +24,15 @@ export function useVerse(chapter: number, verse: number) {
   return useQuery({
     queryKey: ['verse', chapter, verse],
     queryFn: () => apiGet<VerseDetail>(`/api/verses/${chapter}/${verse}`),
+  })
+}
+
+// Commentaries are long, so they load only once the reader opens them.
+export function useCommentaries(chapter: number, verse: number, enabled: boolean) {
+  return useQuery({
+    queryKey: ['commentaries', chapter, verse],
+    queryFn: () => apiGet<Commentary[]>(`/api/verses/${chapter}/${verse}/commentaries`),
+    enabled,
   })
 }
 

@@ -10,6 +10,7 @@ export interface Settings {
   language: Language
   textSize: number // index into TEXT_SCALES
   showTransliteration: boolean
+  autoplay: boolean // continue to the next verse's recitation when one finishes
   translator: Record<Language, string> // preferred translator per language
 }
 
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   language: 'en',
   textSize: 1,
   showTransliteration: true,
+  autoplay: true,
   translator: { en: 'Swami Sivananda', hi: 'Swami Ramsukhdas' },
 }
 

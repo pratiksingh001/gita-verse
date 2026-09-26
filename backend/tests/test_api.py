@@ -98,6 +98,42 @@ def test_unsupported_language_is_rejected(client):
     assert client.get("/api/verses/2/47", params={"lang": "fr"}).status_code == 422
 
 
+# --- audio and commentaries -------------------------------------------------
+
+
+def test_verse_links_its_recitation(client):
+    verse = client.get("/api/verses/2/47").json()
+    assert verse["audio_url"] == "/media/audio/2/47.mp3"
+    audio = client.get(verse["audio_url"])
+    assert audio.status_code == 200
+    assert audio.headers["content-type"] == "audio/mpeg"
+
+
+def test_commentaries(client):
+    commentaries = client.get("/api/verses/2/47/commentaries").json()
+    authors = {c["author"] for c in commentaries}
+    assert {"Sri Shankaracharya", "Sri Ramanujacharya", "Swami Sivananda", "Swami Ramsukhdas"} <= authors
+    # English and Hindi come before the Sanskrit commentaries.
+    languages = [c["language"] for c in commentaries]
+    assert languages.index("sa") > max(i for i, lang in enumerate(languages) if lang != "sa")
+
+
+def test_commentaries_filtered_by_language(client):
+    commentaries = client.get("/api/verses/2/47/commentaries", params={"lang": "hi"}).json()
+    assert commentaries and {c["language"] for c in commentaries} == {"hi"}
+
+
+def test_commentaries_are_cleaned(client):
+    for c in client.get("/api/verses/2/1/commentaries").json():
+        assert "did not comment" not in c["text"].lower()
+        assert not c["text"].rstrip().lower().endswith("no commentary.")
+        assert not c["text"].startswith("।।")
+
+
+def test_commentaries_for_unknown_verse_is_404(client):
+    assert client.get("/api/verses/2/73/commentaries").status_code == 404
+
+
 # --- search -----------------------------------------------------------------
 
 

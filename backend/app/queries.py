@@ -3,12 +3,24 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session, contains_eager
 
+from app.config import MEDIA_DIR, settings
 from app.models import Author, Chapter, Translation, Verse
 from app.schemas import Language, TranslationOut, VerseDetail, VerseRef
+
+LOCAL_AUDIO_URL = "/media/audio"
 
 
 def make_ref(chapter: int, verse: int) -> VerseRef:
     return VerseRef(chapter=chapter, verse=verse, ref=f"{chapter}.{verse}")
+
+
+def audio_url(chapter: int, verse: int) -> str | None:
+    base = settings.audio_base_url.rstrip("/")
+    # Served from the local media folder: only link files that were actually downloaded,
+    # so the player stays hidden until `python -m seed.fetch_audio` has been run.
+    if base == LOCAL_AUDIO_URL and not (MEDIA_DIR / "audio" / str(chapter) / f"{verse}.mp3").exists():
+        return None
+    return f"{base}/{chapter}/{verse}.mp3"
 
 
 def _verse_query():
@@ -60,6 +72,7 @@ def verse_detail(db: Session, verse: Verse, lang: Language | None) -> VerseDetai
         transliteration=verse.transliteration,
         word_meanings=verse.word_meanings,
         translations=translations,
+        audio_url=audio_url(ref.chapter, ref.verse),
         prev=neighbours.get(verse.verse_order - 1),
         next=neighbours.get(verse.verse_order + 1),
     )

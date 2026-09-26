@@ -78,3 +78,18 @@ class Translation(Base):
 
     verse: Mapped[Verse] = relationship(back_populates="translations")
     author: Mapped[Author] = relationship()
+
+
+class Commentary(Base):
+    """A scholar's explanation of a verse: classical Sanskrit bhashyas, plus Hindi and English."""
+
+    __tablename__ = "commentaries"
+    __table_args__ = (UniqueConstraint("verse_id", "author_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    verse_id: Mapped[int] = mapped_column(ForeignKey("verses.id"), index=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
+    language: Mapped[str] = mapped_column(String(8))  # "en" | "hi" | "sa"
+    text: Mapped[str] = mapped_column(Text)
+
+    author: Mapped[Author] = relationship()

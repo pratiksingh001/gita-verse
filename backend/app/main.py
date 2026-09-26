@@ -1,9 +1,10 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.config import settings
+from app.config import MEDIA_DIR, settings
 from app.database import get_db
 from app.models import Verse
 from app.routers import chapters, search, verses
@@ -20,6 +21,9 @@ app.add_middleware(
 app.include_router(chapters.router)
 app.include_router(verses.router)
 app.include_router(search.router)
+
+# Local recitations for development; production serves them from AUDIO_BASE_URL instead.
+app.mount("/media", StaticFiles(directory=MEDIA_DIR, check_dir=False), name="media")
 
 
 @app.get("/api/health")

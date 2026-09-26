@@ -46,8 +46,15 @@ export interface VerseDetail {
   transliteration: string
   word_meanings: string
   translations: Translation[]
+  audio_url: string | null
   prev: VerseRef | null
   next: VerseRef | null
+}
+
+export interface Commentary {
+  author: string
+  language: Language | 'sa'
+  text: string
 }
 
 export interface VerseOfTheDay extends VerseDetail {

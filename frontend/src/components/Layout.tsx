@@ -11,6 +11,7 @@ import { SettingsPanel } from './SettingsPanel'
 /** Set as Link/navigate state to slide the next page in from that side (1 = forward). */
 export interface NavState {
   dir?: 1 | -1
+  autoplay?: boolean // start the recitation on arrival (continuous play)
 }
 
 const NAV = [

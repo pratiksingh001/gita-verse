@@ -7,17 +7,18 @@ Run from the backend/ folder after migrations:
 Safe to re-run: every row is upserted by its dataset ID.
 """
 
+import gzip
 import json
 import re
 import sys
 from pathlib import Path
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.models import Author, Chapter, Translation, Verse
+from app.models import Author, Chapter, Commentary, Translation, Verse
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -25,7 +26,7 @@ EXPECTED_CHAPTERS = 18
 # 701, not 700: this edition includes the extra opening verse of chapter 13.
 EXPECTED_VERSES = 701
 
-LANGUAGE_CODES = {"english": "en", "hindi": "hi"}
+LANGUAGE_CODES = {"english": "en", "hindi": "hi", "sanskrit": "sa"}
 
 # "।।1.1।।" verse markers that prefix the Hindi translations. Range markers like
 # "।।1.4 -- 1.6।।" are kept: they tell the reader one translation spans several verses.
@@ -33,9 +34,20 @@ VERSE_MARKER = re.compile(r"^\s*।।\s*[\d.]+\s*।।\s*")
 # "(टिप्पणी प0 1.2)" footnote references in Swami Ramsukhdas' translation.
 FOOTNOTE_REF = re.compile(r"\s*\(टिप्पणी प0\s*[\d.]+\)")
 
+# Commentaries open with "2.1", "।।2.1।।" or "2.1।।"; ones covering several verses open
+# with a range like "।।1.2  1.9।।" or "।।1.4 --1.6।।", rewritten as a readable first line.
+COMMENTARY_RANGE = re.compile(r"^\s*(?:।।)?\s*(\d+\.\d+)\s*(?:--|–|-)?\s*(\d+\.\d+)\s*(?:।।)?\s*")
+COMMENTARY_MARKER = re.compile(r"^\s*(?:।।)?\s*\d+\.\d+\s*(?:।।)?\s*")
+NO_COMMENTARY = re.compile(r"\s*No commentary\.?\s*$", re.IGNORECASE)
+PLACEHOLDER = re.compile(r"did not comment", re.IGNORECASE)
+# Swami Sivananda's word lists lost their commas to "?": "तम् to him? तथा thus?".
+LOST_COMMA = re.compile(r"\?(?=\s*[ऀ-ॿ])")
+
 
 def load(name: str) -> list[dict]:
-    with open(DATA_DIR / name, encoding="utf-8") as f:
+    path = DATA_DIR / name
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -49,6 +61,20 @@ def clean(text: str) -> str:
 def clean_translation(text: str) -> str:
     text = VERSE_MARKER.sub("", clean(text))
     return FOOTNOTE_REF.sub("", text).strip()
+
+
+def clean_commentary(text: str, language: str) -> str | None:
+    """Cleaned commentary text, or None when the entry only says there is no commentary."""
+    text = clean(text)
+    text = COMMENTARY_RANGE.sub(r"Verses \1–\2\n", text, count=1)
+    text = COMMENTARY_MARKER.sub("", text, count=1)
+    text = NO_COMMENTARY.sub("", text)
+    if language == "en":
+        text = LOST_COMMA.sub(",", text)
+    text = text.strip()
+    if not text or PLACEHOLDER.search(text):
+        return None
+    return text
 
 
 def upsert(db: Session, model, rows: list[dict]) -> None:
@@ -112,9 +138,33 @@ def seed_translations(db: Session) -> None:
         }
         for t in load("translation.json")
     ]
+    upsert_batched(db, Translation, rows)
+
+
+def seed_commentaries(db: Session) -> None:
+    rows = []
+    for c in load("commentary.json.gz"):
+        language = LANGUAGE_CODES[c["lang"]]
+        text = clean_commentary(c["description"], language)
+        if text is not None:
+            rows.append(
+                {
+                    "id": c["id"],
+                    "verse_id": c["verse_id"],
+                    "author_id": c["author_id"],
+                    "language": language,
+                    "text": text,
+                }
+            )
+    upsert_batched(db, Commentary, rows)
+    # Drop rows that earlier runs kept but the current cleaning rules skip.
+    db.execute(delete(Commentary).where(Commentary.id.not_in([r["id"] for r in rows])))
+
+
+def upsert_batched(db: Session, model, rows: list[dict], size: int = 1000) -> None:
     # Postgres caps bind parameters per statement, so insert in batches.
-    for start in range(0, len(rows), 1000):
-        upsert(db, Translation, rows[start : start + 1000])
+    for start in range(0, len(rows), size):
+        upsert(db, model, rows[start : start + size])
 
 
 def validate(db: Session) -> list[str]:
@@ -162,6 +212,10 @@ def validate(db: Session) -> list[str]:
     if empty_translations:
         errors.append(f"{empty_translations} translations are empty")
 
+    commentaries = db.scalar(select(func.count()).select_from(Commentary))
+    if not commentaries:
+        errors.append("no commentaries loaded")
+
     return errors
 
 
@@ -172,6 +226,7 @@ def main() -> None:
         seed_authors(db)
         seed_verses(db)
         seed_translations(db)
+        seed_commentaries(db)
 
         errors = validate(db)
         if errors:
@@ -184,7 +239,11 @@ def main() -> None:
         db.commit()
 
         translations = db.scalar(select(func.count()).select_from(Translation))
-        print(f"Seeded {EXPECTED_CHAPTERS} chapters, {EXPECTED_VERSES} verses, {translations} translations.")
+        commentaries = db.scalar(select(func.count()).select_from(Commentary))
+        print(
+            f"Seeded {EXPECTED_CHAPTERS} chapters, {EXPECTED_VERSES} verses, "
+            f"{translations} translations, {commentaries} commentaries."
+        )
 
 
 if __name__ == "__main__":
