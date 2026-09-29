@@ -134,6 +134,42 @@ frontend/public/music/bansuri.mp3
 
 The music button and setting stay hidden until the file is there.
 
+## Deployment
+
+The app ships as one Docker image (`Dockerfile`): FastAPI serves the API and the built
+frontend, so everything runs on one origin and the session cookie needs no cross-site setup.
+On every start, `backend/start.sh` runs the migrations and the seed (both safe to re-run),
+then starts the API on `$PORT`.
+
+It needs a Postgres database and these environment variables:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | The database's connection URL (`postgres://` and `postgresql://` both work) |
+| `COOKIE_SECURE` | `true` |
+| `AUDIO_BASE_URL` | `https://cdn.jsdelivr.net/gh/gita/gita@main/data/verse_recitation` |
+| `GOOGLE_CLIENT_ID` | Optional; also add the site's URL to the OAuth client's JavaScript origins |
+
+Leave `VITE_API_URL` unset: the frontend calls the API on its own origin.
+
+**Render** (`render.yaml`): push the repository to GitHub, then in the Render dashboard choose
+**New > Blueprint** and pick the repository. It creates the web service and the database.
+The free web service sleeps when idle (about a minute to wake), and the free database expires
+after 30 days, so move to paid plans for a real launch.
+
+**Anywhere else that runs Docker** (Railway, Fly.io, a VPS): build the image from the repo
+root and set the variables above.
+
+Try the production image locally, against the Compose database:
+
+```bash
+docker build -t gita-verse .
+docker run --rm -p 8080:8000 -e DATABASE_URL=postgresql://gita:gita@host.docker.internal:5433/gita_verse gita-verse
+```
+
+The background music file (`frontend/public/music/bansuri.mp3`) is part of the build, so
+commit it if you want music in production.
+
 ## Schema changes
 
 After editing `backend/app/models.py`:

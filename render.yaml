@@ -1,0 +1,28 @@
+# Render Blueprint: the app (Dockerfile) plus a managed Postgres database.
+# Deploy from the Render dashboard: New > Blueprint > pick this repository.
+services:
+  - type: web
+    name: gita-verse
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gita-verse-db
+          property: connectionString
+      - key: COOKIE_SECURE
+        value: "true"
+      # Recitations straight from the dataset's GitHub repo, via the jsDelivr CDN.
+      - key: AUDIO_BASE_URL
+        value: https://cdn.jsdelivr.net/gh/gita/gita@main/data/verse_recitation
+      # Optional: Google sign-in. Render asks for the value when the Blueprint is created.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+
+databases:
+  - name: gita-verse-db
+    databaseName: gita_verse
+    region: singapore
+    plan: free
